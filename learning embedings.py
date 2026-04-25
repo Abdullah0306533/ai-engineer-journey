@@ -13,9 +13,6 @@ knowledge_base = [
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-query_vec = model.encode(query)
-embeddings = model.encode(knowledge_base)
-
 
 def cosine_similarity(vec1, vec2):
     dot_product = np.dot(vec1, vec2)
@@ -23,12 +20,18 @@ def cosine_similarity(vec1, vec2):
     return dot_product / magnitude
 
 
-# Finding the most similar line
+def find_most_similar(_query, _knowledge_base):
+    query_vec = model.encode(_query)
+    embeddings = model.encode(_knowledge_base)
+    # Finding the most similar line
+    scores = [cosine_similarity(query_vec, emb) for emb in embeddings]
+    highest_score = max(scores)
+    index = scores.index(highest_score)
+    _result = _knowledge_base[index]
+    return _result, highest_score
 
-find = list(range(len(knowledge_base)))
-for i in range(len(embeddings)):
-    find[i] = cosine_similarity(query_vec, embeddings[i])
 
 # Printing Line the most similar
-max_prob=max(find)
-print(f"Query: {query} Matched Sentence:{knowledge_base[find.index(max_prob)]} {max_prob}")
+result, score = find_most_similar(query, knowledge_base)
+print(f"Best match: {result}")
+print(f"Score: {score:.4f}")
